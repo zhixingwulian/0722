@@ -1,0 +1,133 @@
+C51 COMPILER V9.60.0.0   SYS                                                               07/16/2019 14:55:42 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE SYS
+OBJECT MODULE PLACED IN .\Objects\sys.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE ..\library\StdDriver\src\sys.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Objects\S
+                    -tdDriver\inc;..\Objects\StdDriver\src;..\library\Device\Include;..\library\Device\Include;..\library\StdDriver\inc;..\li
+                    -brary\StdDriver\src) DEBUG OBJECTEXTEND PRINT(.\Listings\sys.lst) TABS(2) OBJECT(.\Objects\sys.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* Copyright(c) 2019 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   4          /*                                                                                                        
+             - */
+   5          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   6          
+   7          //********************************************************************************************************
+             -***
+   8          //  Website: http://www.nuvoton.com
+   9          //  E-Mail : MicroC-8bit@nuvoton.com
+  10          //  Date   : Jan/21/2019
+  11          //********************************************************************************************************
+             -***
+  12          #include "MS51.h"
+  13          bit BIT_TMP;
+  14          
+  15          /****************************************************************************/
+  16          /* Need re- power on to confirm enable modify HIRC.
+  17          /****************************************************************************/
+  18          void MODIFY_HIRC_16(void)
+  19          {
+  20   1          unsigned char data hircmap0,hircmap1;
+  21   1          set_CHPCON_IAPEN;
+  22   1          IAPAL = 0x30;
+  23   1          IAPAH = 0x00;
+  24   1          IAPCN = READ_UID;
+  25   1          set_IAPTRG_IAPGO;
+  26   1          hircmap0 = IAPFD;
+  27   1          IAPAL = 0x31;
+  28   1          IAPAH = 0x00;
+  29   1          set_IAPTRG_IAPGO;
+  30   1          hircmap1 = IAPFD;
+  31   1          clr_CHPCON_IAPEN;
+  32   1          TA=0XAA;
+  33   1          TA=0X55;
+  34   1          RCTRIM0 = hircmap0;
+  35   1          TA=0XAA;
+  36   1          TA=0X55;
+  37   1          RCTRIM1 = hircmap1;
+  38   1      }
+  39          
+  40          
+  41          void MODIFY_HIRC_24(void)
+  42          {
+  43   1          unsigned char data hircmap0,hircmap1;
+  44   1      /* Check if power on reset, modify HIRC */
+  45   1          if (PCON&SET_BIT4)
+  46   1          {
+C51 COMPILER V9.60.0.0   SYS                                                               07/16/2019 14:55:42 PAGE 2   
+
+  47   2              set_CHPCON_IAPEN;
+  48   2              IAPAL = 0x38;
+  49   2              IAPAH = 0x00;
+  50   2              IAPCN = READ_UID;
+  51   2              set_IAPTRG_IAPGO;
+  52   2              hircmap0 = IAPFD;
+  53   2              IAPAL = 0x39;
+  54   2              IAPAH = 0x00;
+  55   2              set_IAPTRG_IAPGO;
+  56   2              hircmap1 = IAPFD;
+  57   2              clr_CHPCON_IAPEN;
+  58   2              TA=0XAA;
+  59   2              TA=0X55;
+  60   2              RCTRIM0 = hircmap0;
+  61   2              TA=0XAA;
+  62   2              TA=0X55;
+  63   2              RCTRIM1 = hircmap1;
+  64   2              clr_CHPCON_IAPEN;
+  65   2          }
+  66   1      }
+  67          
+  68          #if 0
+              /****************************************************************************/
+              /* If call this macro, Please Modify option -> Preproceessing Symbols
+              /* -> Define "FOSC_160000" to "FOSC_166000"
+              /****************************************************************************/
+              /*==========================================================================*/
+              void MODIFY_HIRC_166(void)
+              {
+                  unsigned char data hircmap0,hircmap1;
+                  unsigned int trimvalue16bit;
+              /* Check if power on reset, modify HIRC */
+                  if (PCON&SET_BIT4)        
+                  {
+                      hircmap0 = RCTRIM0;
+                      hircmap1 = RCTRIM1;
+                      trimvalue16bit = ((hircmap0<<1)+(hircmap1&0x01));
+                      trimvalue16bit = trimvalue16bit - 15;
+                      hircmap1 = trimvalue16bit&0x01;
+                      hircmap0 = trimvalue16bit>>1;
+                      TA=0XAA;
+                      TA=0X55;
+                      RCTRIM0 = hircmap0;
+                      TA=0XAA;
+                      TA=0X55;
+                      RCTRIM1 = 0X03;
+              /* Clear power on flag */
+                      PCON &= CLR_BIT4;
+                  }
+              }
+              #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    249    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.60.0.0   SYS                                                               07/16/2019 14:55:42 PAGE 3   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

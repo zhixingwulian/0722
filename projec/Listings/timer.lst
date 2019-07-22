@@ -1,0 +1,154 @@
+C51 COMPILER V9.60.0.0   TIMER                                                             07/18/2019 10:33:29 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TIMER
+OBJECT MODULE PLACED IN .\Objects\timer.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE timer.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\library\StdDriver\inc;..\Objects
+                    -\StdDriver\inc;..\Objects\StdDriver\src;..\library\Device\Include;..\library\Device\Include;..\library\StdDriver\inc;..\
+                    -library\StdDriver\src) DEBUG OBJECTEXTEND PRINT(.\Listings\timer.lst) TABS(2) OBJECT(.\Objects\timer.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* Copyright(c) 2019 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   4          /*                                                                                                        
+             - */
+   5          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   6          
+   7          /*********************************************************************************************************
+             -**/
+   8          /* Website: http://www.nuvoton.com                                                                        
+             - */
+   9          /*  E-Mail : MicroC-8bit@nuvoton.com                                                                      
+             - */
+  10          /*  Date   : Jan/21/2019                                                                                  
+             - */
+  11          /*********************************************************************************************************
+             -**/
+  12          
+  13          /*********************************************************************************************************
+             -***/
+  14          /*  File Function: MS51 UART0 initial demo code                                                           
+             -  */
+  15          /*********************************************************************************************************
+             -***/
+  16          #include "MS51.H"
+  17          
+  18          bit receiveFlag;
+  19          int LedFlag = 0;
+  20          char a[11] = 0;
+  21          UINT32 receive[11] = 0;
+  22          int j = 0;
+  23          int T = 0;
+  24          char flag =0;
+  25          /*********************************************************************************************************
+             -***
+  26          
+  27          **********************************************************************************************************
+             -**/
+  28          void Serial_ISR (void) interrupt 4 
+  29          {
+  30   1          
+  31   1          if (RI)
+  32   1          {   
+  33   2            receiveFlag = 1;
+  34   2            LedFlag++;
+  35   2            receive[j] = SBUF;
+  36   2            j++;
+  37   2            clr_SCON_RI;                                         // Clear RI (Receive Interrupt).
+  38   2          }
+C51 COMPILER V9.60.0.0   TIMER                                                             07/18/2019 10:33:29 PAGE 2   
+
+  39   1          if (TI)
+  40   1          {       
+  41   2              clr_SCON_TI;                                       // Clear TI (Transmit Interrupt).
+  42   2          }
+  43   1      
+  44   1      }
+  45          
+  46          
+  47          
+  48          /*********************************************************************************************************
+             -***
+  49          *    Main function 
+  50          **********************************************************************************************************
+             -**/
+  51          void main (void)
+  52          {
+  53   1          int i = 0;
+  54   1          P12_PUSHPULL_MODE;
+  55   1      
+  56   1          ENABLE_TIMER1_MODE0;                           /* Timer 0 mode configuration */
+  57   1          MODIFY_HIRC_24();
+  58   1          UART_Open(24000000,UART0_Timer3,115200);
+  59   1          ENABLE_UART0_PRINTF;
+  60   1      
+  61   1       //   ENABLE_TIMER0_INTERRUPT;                       /* enable Timer0 interrupt */ 
+  62   1          ENABLE_GLOBAL_INTERRUPT; 
+  63   1          set_IE_ES;                                  /* Enable UART0 interrupt */
+  64   1          set_IE_EA;
+  65   1          
+  66   1          
+  67   1          while(1){
+  68   2            
+  69   2          if (receiveFlag)
+  70   2          {
+  71   3            receiveFlag = 0;
+  72   3            clr_IE_ES;
+  73   3            UART_Send_Data(UART0,receive[i]);
+  74   3            i++;
+  75   3            set_IE_ES;
+  76   3           } 
+  77   2      
+  78   2      
+  79   2          if(LedFlag == 11){
+  80   3            flag = receive[6];
+  81   3            if(flag == 0xFF){
+  82   4                P12 = 0;
+  83   4                LedFlag = 0;
+  84   4                j = 0;
+  85   4              //  UART_Send_Data(UART0,"chang guan");
+  86   4            }
+  87   3            else if(flag == 0x00){
+  88   4                P12 = 1;
+  89   4                LedFlag = 0;
+  90   4                j = 0;
+  91   4                //UART_Send_Data(UART0,"chang kai");
+  92   4            }
+  93   3            else if(0x00< flag < 0x0B){
+  94   4                T = flag - '0' ;
+  95   4              //  T = T + 0;
+  96   4                P12 = 0;
+  97   4                UART_Send_Data(UART0,flag);
+  98   4                for(i =0;i < T;i++){
+C51 COMPILER V9.60.0.0   TIMER                                                             07/18/2019 10:33:29 PAGE 3   
+
+  99   5                  Timer0_Delay(24000000,100,9998);
+ 100   5                }
+ 101   4                P12 = 1;
+ 102   4                LedFlag = 0; 
+ 103   4                j =0;
+ 104   4                UART_Send_Data(UART0,flag);
+ 105   4            }
+ 106   3          }
+ 107   2        }   
+ 108   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    354    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     62       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

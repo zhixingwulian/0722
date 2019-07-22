@@ -1,0 +1,1 @@
+"..\library\StdDriver\src\uart.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(..\Objects\StdDriver\inc;..\Objects\StdDriver\src;..\library\Device\Include;..\library\Device\Include;..\library\StdDriver\inc;..\library\StdDriver\src) DEBUG OBJECTEXTEND PRINT(.\Listings\uart.lst) TABS (2) OBJECT(.\Objects\uart.obj)

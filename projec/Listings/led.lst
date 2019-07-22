@@ -1,0 +1,51 @@
+C51 COMPILER V9.60.0.0   LED                                                               07/11/2019 15:47:42 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE LED
+OBJECT MODULE PLACED IN .\Objects\led.obj
+COMPILER INVOKED BY: D:\chengxu\C51\BIN\C51.EXE led.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Objects\StdDriver\inc;..\Object
+                    -s\StdDriver\src;..\Objects\Device\Include;..\Objects\StdDriver\inc) DEBUG OBJECTEXTEND PRINT(.\Listings\led.lst) TABS(2)
+                    - OBJECT(.\Objects\led.obj)
+
+line level    source
+
+   1          #include "MS51.H"
+   2          bit LedFlag;
+   3          
+   4          
+   5          void main (void)
+   6          {
+   7   1          int i = 0;
+   8   1          int s;
+   9   1          P12_PUSHPULL_MODE;
+  10   1      
+  11   1          ENABLE_TIMER1_MODE0;                           /* Timer 0 mode configuration */
+  12   1          MODIFY_HIRC_24();
+  13   1          UART_Open(24000000,UART0_Timer3,115200);
+  14   1          ENABLE_UART0_PRINTF;
+  15   1      
+  16   1          ENABLE_TIMER0_INTERRUPT;                       /* enable Timer0 interrupt */ 
+  17   1          ENABLE_GLOBAL_INTERRUPT; 
+  18   1      
+  19   1          P12 = 0;
+  20   1            for(i =0;i < 5;i++){
+  21   2                Timer0_Delay(24000000,5900,1000);
+  22   2              }
+  23   1      
+  24   1            P12 = 1;
+  25   1          }
+*** WARNING C280 IN LINE 8 OF led.c: 's': unreferenced local variable
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    103    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

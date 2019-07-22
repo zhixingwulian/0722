@@ -1,0 +1,1 @@
+"timer.c" OPTIMIZE (8,SPEED) BROWSE INCDIR(..\library\StdDriver\inc;..\Objects\StdDriver\inc;..\Objects\StdDriver\src;..\library\Device\Include;..\library\Device\Include;..\library\StdDriver\inc;..\library\StdDriver\src) DEBUG OBJECTEXTEND PRINT(.\Listings\timer.lst) TABS (2) OBJECT(.\Objects\timer.obj)

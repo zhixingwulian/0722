@@ -1,0 +1,8 @@
+".\Objects\STARTUP.obj",
+".\Objects\timer.obj",
+".\Objects\delay.obj",
+".\Objects\sys.obj",
+".\Objects\uart.obj" 
+TO ".\Objects\time" 
+PRINT(".\Listings\time.m51") RAMSIZE(256) 
+XDATA( 0X0000-0X03FF )

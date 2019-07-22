@@ -1,0 +1,129 @@
+C51 COMPILER V9.60.0.0   UART                                                              07/16/2019 14:55:43 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN .\Objects\uart.obj
+COMPILER INVOKED BY: D:\keil\C51\BIN\C51.EXE ..\library\StdDriver\src\uart.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Objects\
+                    -StdDriver\inc;..\Objects\StdDriver\src;..\library\Device\Include;..\library\Device\Include;..\library\StdDriver\inc;..\l
+                    -ibrary\StdDriver\src) DEBUG OBJECTEXTEND PRINT(.\Listings\uart.lst) TABS(2) OBJECT(.\Objects\uart.obj)
+
+line level    source
+
+   1          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   2          /*                                                                                                        
+             - */
+   3          /* Copyright(c) 2019 Nuvoton Technology Corp. All rights reserved.                                        
+             - */
+   4          /*                                                                                                        
+             - */
+   5          /*--------------------------------------------------------------------------------------------------------
+             --*/
+   6          
+   7          /*********************************************************************************************************
+             -**/
+   8          /*  Website: http://www.nuvoton.com                                                                       
+             - */
+   9          /*  E-Mail : MicroC-8bit@nuvoton.com                                                                      
+             - */
+  10          /*  Date   : Jan/21/2019                                                                                  
+             - */
+  11          /*********************************************************************************************************
+             -**/
+  12          #include "MS51.h"
+  13          
+  14          /*MS51 new version buadrate */
+  15          
+  16          void UART_Open(unsigned long u32SysClock, unsigned char u8UARTPort,unsigned long u32Baudrate)
+  17          {
+  18   1        switch(u8UARTPort)
+  19   1        {
+  20   2          case UART0_Timer1:
+  21   2                P06_PUSHPULL_MODE;    //Setting UART pin as Quasi mode for transmit
+  22   2                P07_INPUT_MODE;    //Setting UART pin as Quasi mode for transmit  
+  23   2                SCON = 0x50;       //UART0 Mode1,REN=1,TI=1
+  24   2                TMOD |= 0x20;      //Timer1 Mode1
+  25   2                set_PCON_SMOD;          //UART0 Double Rate Enable
+  26   2                set_CKCON_T1M;
+  27   2                clr_T3CON_BRCK;          //Serial port 0 baud rate clock source = Timer1
+  28   2                TH1 = 256 - (u32SysClock/16/u32Baudrate);
+  29   2                set_TCON_TR1;
+  30   2            break;
+  31   2            
+  32   2            case UART0_Timer3:
+  33   2                P06_PUSHPULL_MODE;    //Setting UART pin as Quasi mode for transmit
+  34   2                P07_INPUT_MODE;    //Setting UART pin as Quasi mode for transmit  
+  35   2                SCON = 0x50;     //UART0 Mode1,REN=1,TI=1
+  36   2                set_PCON_SMOD;        //UART0 Double Rate Enable
+  37   2                T3CON &= 0xF8;   //T3PS2=0,T3PS1=0,T3PS0=0(Prescale=1)
+  38   2                set_T3CON_BRCK;        //UART0 baud rate clock source = Timer3
+  39   2                RH3    = HIBYTE(65536 - (u32SysClock/16/u32Baudrate));  
+  40   2                RL3    = LOBYTE(65536 - (u32SysClock/16/u32Baudrate));  
+  41   2                set_T3CON_TR3;         //Trigger Timer3
+  42   2            break;
+  43   2            
+C51 COMPILER V9.60.0.0   UART                                                              07/16/2019 14:55:43 PAGE 2   
+
+  44   2            case UART1_Timer3:
+  45   2                P16_PUSHPULL_MODE;  //Setting UART pin as Quasi mode for transmit
+  46   2                P02_INPUT_MODE;  //Setting RXD_1 pin as Input mode for transmit   
+  47   2                SCON_1 = 0x50;     //UART1 Mode1,REN_1=1,TI_1=1
+  48   2                T3CON = 0x80;     //T3PS2=0,T3PS1=0,T3PS0=0(Prescale=1), UART1 in MODE 1
+  49   2                RH3    = HIBYTE(65536 - (u32SysClock/16/u32Baudrate));  
+  50   2                RL3    = LOBYTE(65536 - (u32SysClock/16/u32Baudrate));     
+  51   2                set_T3CON_TR3;             //Trigger Timer3                                                     
+             -        
+  52   2            break; 
+  53   2        }
+  54   1      }
+  55          
+  56          unsigned char Receive_Data(unsigned char UARTPort)
+  57          {
+  58   1          UINT8 c;
+  59   1          switch (UARTPort)
+  60   1          {
+  61   2            case UART0:
+  62   2              while (!RI);
+  63   2              c = SBUF;
+  64   2              RI = 0;
+  65   2            break;
+  66   2            case UART1:
+  67   2              while (!RI_1);
+  68   2              c = SBUF_1;
+  69   2              RI_1 = 0;
+  70   2            break;
+  71   2          }
+  72   1          return (c);
+  73   1      }
+  74          
+  75          void UART_Send_Data(UINT8 UARTPort, UINT8 c)
+  76          {
+  77   1          switch (UARTPort)
+  78   1          {
+  79   2            case UART0:
+  80   2              TI = 0;
+  81   2              SBUF = c;
+  82   2              while(TI==0);
+  83   2            break;
+  84   2            case UART1:
+  85   2              TI_1 = 0;
+  86   2              SBUF_1 = c;
+  87   2              while(TI_1==0);
+  88   2            break;
+  89   2          }
+  90   1      }
+  91          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    267    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
